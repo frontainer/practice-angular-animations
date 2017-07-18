@@ -1,0 +1,29 @@
+<form action="" (submit)="add($event, input)">
+  <md-input-container>
+    <input mdInput placeholder="TODO" #input>
+  </md-input-container>
+  <button md-raised-button>追加</button>
+</form>
+
+<form action="">
+  <md-input-container>
+    <input mdInput name="search" [(ngModel)]="searchWord" placeholder="検索ワード">
+  </md-input-container>
+  <md-radio-group class="example-radio-group" (change)="changeFilter($event)" [(ngModel)]="filterState" name="filter">
+    <md-radio-button class="example-radio-button" *ngFor="let item of filterItems" [value]="item.name">{{item.label}}
+    </md-radio-button>
+  </md-radio-group>
+</form>
+
+<md-list *ngIf="(list | async | todoSearch : searchWord) as items">
+  <md-list-item *ngFor="let item of items" (click)="changeState(item.id)">
+    <md-checkbox md-list-icon [checked]="item.state === 'complete'" (click)="$event.preventDefault()"></md-checkbox>
+    <h4 md-line>{{item.value}}</h4>
+    <p md-line>{{item.id | date : 'yyyy/MM/dd hh:mm'}}</p>
+    <p>
+      <md-icon (click)="delete(item.id)">delete</md-icon>
+    </p>
+  </md-list-item>
+</md-list>
+
+<button md-raised-button color="warn" (click)="clearComplete()">完了したタスクを削除</button>
