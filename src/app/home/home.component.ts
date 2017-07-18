@@ -5,11 +5,62 @@ import { TodoItem } from '../shared/models/todo';
 
 import { MdRadioChange } from '@angular/material';
 
+import {
+  transition,
+  trigger,
+  state,
+  style,
+  animate,
+  useAnimation,
+  query,
+  stagger,
+  group
+} from '@angular/animations';
+import { slideFadeIn, slideFadeOut } from '../app.animations';
+
 @Component({
-  selector: 'app-home',
+  selector: 'et-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
+  animations: [
+    trigger('stateEffect', [
+      state('complete', style({
+        backgroundColor: '#eee'
+      })),
+      transition('todo => complete', [
+        style({
+          backgroundColor: '#fff'
+        }),
+        animate('200ms ease-out', style({
+          backgroundColor: '#eee'
+        }))
+      ]),
+      transition('complete => todo', [
+        style({
+          backgroundColor: '#eee'
+        }),
+        animate('200ms ease-in', style({
+          backgroundColor: '#fff'
+        }))
+      ])
+    ]),
+    trigger('slideFade', [
+      transition('* => *', [
+        group([
+          query(':leave', [
+            useAnimation(slideFadeOut)
+          ], { optional: true }),
+          query(':enter', [
+            stagger(50, [
+              useAnimation(slideFadeIn)
+            ])
+          ], { optional: true })
+        ])
+      ])
+    ])
+  ]
 })
+
 export class HomeComponent implements OnInit {
   public list: Observable<TodoItem[]>;
   public searchWord: string = '';

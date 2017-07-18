@@ -3,6 +3,8 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { TodoItem } from '../models/todo';
 
+import 'rxjs/add/operator/timeout';
+
 @Injectable()
 export class TodoService {
   private subject: BehaviorSubject<TodoItem[]> = new BehaviorSubject([]);

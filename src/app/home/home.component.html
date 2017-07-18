@@ -15,8 +15,8 @@
   </md-radio-group>
 </form>
 
-<md-list *ngIf="(list | async | todoSearch : searchWord) as items">
-  <md-list-item *ngFor="let item of items" (click)="changeState(item.id)">
+<md-list *ngIf="(list | async | todoSearch : searchWord) as items" [@slideFade]="items">
+  <md-list-item *ngFor="let item of items" (click)="changeState(item.id)" [@stateEffect]="item.state">
     <md-checkbox md-list-icon [checked]="item.state === 'complete'" (click)="$event.preventDefault()"></md-checkbox>
     <h4 md-line>{{item.value}}</h4>
     <p md-line>{{item.id | date : 'yyyy/MM/dd hh:mm'}}</p>
