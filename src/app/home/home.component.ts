@@ -61,6 +61,7 @@ export class HomeComponent implements OnInit {
   clearComplete() {
     if (window.confirm('完了したタスクをすべて削除してよろしいですか？')) {
       this.todoService.clearComplete();
+      this.reset();
     }
   }
 }
