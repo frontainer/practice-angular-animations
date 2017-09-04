@@ -103,6 +103,9 @@ npm i -S @angular/material @angular/cdk
 スタイルテーマを追加
 ```styles.scss
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+md-list-item {
+  overflow: hidden;
+}
 ```
 
 app.moduleに使いたいモジュールをimportしておくよ！
@@ -157,7 +160,7 @@ export class AppModule { }
 
 ToDoを保持するServiceを作りますよ！
 ```
-ng g service shared/services/todo  
+ng g service shared/services/todo/todo
 ```
 
 > WARNING Service is generated but not provided, it must be provided to be used
@@ -166,14 +169,14 @@ ServiceはModuleに勝手に読み込まれないので注意です。
 
 Serviceで使う型定義書くファイルも一緒に作りましょう。
 ```
-ng g interface shared/models/todo 
+ng g interface shared/services/todo/todo model
 ```
 
-```shared/models/todo.ts
+```shared/services/todo/todo.model.ts
 export interface TodoItem {
-  id: number,
-  state: string,
-  value: string
+  id: number;
+  state: string;
+  value: string;
 }
 ```
 
@@ -181,7 +184,7 @@ export interface TodoItem {
 
 ```shared/services/todo.service.ts
 import { Injectable } from '@angular/core';
-import { TodoItem } from '../models/todo'; // <-追加
+import { TodoItem } from './todo.model'; // <-追加
 
 @Injectable()
 export class TodoService {
@@ -195,7 +198,7 @@ export class TodoService {
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { TodoItem } from '../models/todo';
+import { TodoItem } from './todo.model';
 
 @Injectable()
 export class TodoService {
@@ -313,7 +316,7 @@ ng g pipe shared/pipes/todoSearch
 
 ```shared/pipes/todo-search.ts
 import { Pipe, PipeTransform } from '@angular/core';
-import { TodoItem } from '../models/todo';
+import { TodoItem } from '../services/todo/todo.model';
 
 @Pipe({
   name: 'todoSearch'
@@ -332,32 +335,20 @@ export class TodoSearchPipe implements PipeTransform {
 ```home/home.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { TodoService } from '../shared/services/todo.service';
-import { TodoItem } from '../shared/models/todo';
+import { TodoService } from '../shared/services/todo/todo.service';
+import { TodoItem } from '../shared/services/todo/todo.model';
 
 import { MdRadioChange } from '@angular/material';
 
-import { slideFadeIn, slideFadeOut } from '../app.animations';
-import {
-  transition,
-  trigger,
-  state,
-  style,
-  stagger,
-  query,
-  group,
-  animateChild
-} from '@angular/animations';
-
 @Component({
-  selector: 'et-home',
+  selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
   public list: Observable<TodoItem[]>;
-  public searchWord: string = '';
-  public filterState: string = 'all';
+  public searchWord = '';
+  public filterState = 'all';
   public filterItems = [
     {
       name: 'all',
@@ -429,6 +420,8 @@ export class HomeComponent implements OnInit {
   </md-radio-group>
 </form>
 
+<button md-raised-button color="warn" (click)="clearComplete()">完了したタスクを削除</button>
+
 <md-list *ngIf="(list | async | todoSearch : searchWord) as items">
   <md-list-item *ngFor="let item of items" (click)="changeState(item.id)">
     <md-checkbox md-list-icon [checked]="item.state === 'complete'" (click)="$event.preventDefault()"></md-checkbox>
@@ -439,12 +432,7 @@ export class HomeComponent implements OnInit {
     </p>
   </md-list-item>
 </md-list>
-
-<button md-raised-button color="warn" (click)="clearComplete()">完了したタスクを削除</button>
 ```
-
-ここまではこちらのリポジトリにあります。
-https://github.com/frontainer/practice-angular-animations
 
 ---
 
@@ -471,7 +459,7 @@ import {
       state('complete', style({
         backgroundColor: '#eee'
       })),
-      transition('todo => complete', [
+      transition('* => complete', [
         style({
           backgroundColor: '#fff'
         }),
@@ -479,7 +467,7 @@ import {
           backgroundColor: '#eee'
         }))
       ]),
-      transition('complete => todo', [
+      transition('* => todo', [
         style({
           backgroundColor: '#eee'
         }),
@@ -493,8 +481,8 @@ import {
 })
 ```
 
-```home/home.component.html
-<md-list-item *ngFor="let item of items" (click)="changeState(item.id)"   [@stateEffect]="item.state">
+```home/home.component.html 21行目
+<md-list-item *ngFor="let item of items" (click)="changeState(item.id)" [@stateEffect]="item.state">
 ```
 
 `[@stateEffect]="item.state"`を追加しました。
@@ -522,7 +510,7 @@ import {
 4.2で追加されたanimation関数を使うことで共通に使うアニメーションの定義をすることができます。パラメータで実行時間などは変更できるので、ある程度汎用的に作れる様になりますよ！
 
 ```
-ng g class app.animations.ts
+ng g class app.animations
 ```
 
 代表的なフェードイン・フェードアウトを書いてみましょう。
@@ -552,12 +540,10 @@ export const slideFadeIn = animation([
 export const slideFadeOut = animation([
   style({
     opacity: 1,
-    transform: 'translateX(0)',
     height: '*'
   }),
   animate('{{time}} {{easing}}', style({
     opacity: 0,
-    transform: 'translateX(-2%)',
     height: 0
   }))
 ], {
@@ -591,9 +577,9 @@ componentのanimationsにアニメーションを定義を追加しますよ！
   selector: 'et-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'], // <- 「,」忘れずに
-  // 追加ここから
   animations: [
     // ...略
+    // 追加ここから
     trigger('slideFade', [
       transition(':enter', [
         useAnimation(slideFadeIn)
@@ -602,12 +588,12 @@ componentのanimationsにアニメーションを定義を追加しますよ！
         useAnimation(slideFadeOut)
       ])
     ])
+    // 追加ここまで
   ]
- // 追加ここまで
 })
 ```
 
-```home/home.component.html
+```home/home.component.html 21行目
 <md-list-item *ngFor="let item of items" (click)="changeState(item.id)" [@stateEffect]="item.state" @slideFade>
 ```
 
@@ -644,6 +630,7 @@ import {
   stagger // <- 追加
 } from '@angular/animations';
 // ...略
+// slideFade置き換えここから
 trigger('slideFade', [
   transition('* => *', [
     query(':leave', [
@@ -656,9 +643,10 @@ trigger('slideFade', [
     ], { optional: true })
   ])
 ])
+// slideFade置き換えここまで
 ```
 
-```home/home.component.html
+```home/home.component.html 20行目
 <md-list *ngIf="(list | async | todoSearch : searchWord) as items" [@slideFade]="items">
   <md-list-item *ngFor="let item of items" (click)="changeState(item.id)" [@stateEffect]="item.state">
 ```
@@ -690,9 +678,10 @@ import {
 } from '@angular/animations';
 
 // ...略
+// slideFade置き換えここから
 trigger('slideFade', [
   transition('* => *', [
-    group([ //<- 追加
+    group([ // <- 追加
       query(':leave', [
         useAnimation(slideFadeOut)
       ], { optional: true }),
@@ -701,9 +690,10 @@ trigger('slideFade', [
           useAnimation(slideFadeIn)
         ])
       ], { optional: true })
-    ]) //<- 追加
+    ]) // <- 追加
   ])
 ])
+// slideFade置き換えここまで
 ```
 
 これで消えつつ表示されるようになりました。
