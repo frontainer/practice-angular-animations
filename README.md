@@ -294,7 +294,7 @@ export class TodoService {
 ```
 
 ```app.module.ts
-import { TodoService } from './shared/services/todo.service';
+import { TodoService } from './shared/services/todo/todo.service';
 
 @NgModule({
  // ...略
