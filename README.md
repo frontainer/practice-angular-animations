@@ -12,12 +12,11 @@ npm i @angular/cli -g
 プロジェクトを作成するディレクトリで次のコマンドを実行
 
 ```
-ng new animation-workshop --routing --style=scss --prefix=et
+ng new animation-workshop --routing --style=scss
 ```
 
 - --routing ルーティングを使うアプリケーションを構築する宣言（`app-routing.module.ts`ができる）
 - --style コンポーネントで使うcssの種類（css/scss/sassなど）
-- --prefix コンポーネントのPrefix（デフォルトが`app-`）UIコンポーネント集とか作るときはきちんと設定しよう
 
 以上で準備完了！
 
