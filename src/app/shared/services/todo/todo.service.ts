@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { TodoItem } from '../models/todo';
-
-import 'rxjs/add/operator/timeout';
+import { TodoItem } from './todo.model';
 
 @Injectable()
 export class TodoService {

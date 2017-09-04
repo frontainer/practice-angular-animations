@@ -22,12 +22,10 @@ export const slideFadeIn = animation([
 export const slideFadeOut = animation([
   style({
     opacity: 1,
-    transform: 'translateX(0)',
     height: '*'
   }),
   animate('{{time}} {{easing}}', style({
     opacity: 0,
-    transform: 'translateX(-2%)',
     height: 0
   }))
 ], {
@@ -36,4 +34,3 @@ export const slideFadeOut = animation([
     easing: 'ease-out'
   }
 });
-

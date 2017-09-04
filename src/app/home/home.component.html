@@ -15,6 +15,8 @@
   </md-radio-group>
 </form>
 
+<button md-raised-button color="warn" (click)="clearComplete()">完了したタスクを削除</button>
+
 <md-list *ngIf="(list | async | todoSearch : searchWord) as items" [@slideFade]="items">
   <md-list-item *ngFor="let item of items" (click)="changeState(item.id)" [@stateEffect]="item.state">
     <md-checkbox md-list-icon [checked]="item.state === 'complete'" (click)="$event.preventDefault()"></md-checkbox>
@@ -25,5 +27,3 @@
     </p>
   </md-list-item>
 </md-list>
-
-<button md-raised-button color="warn" (click)="clearComplete()">完了したタスクを削除</button>

@@ -1,5 +1,2 @@
-export interface TodoItem {
-  id: number,
-  state: string,
-  value: string
+export interface Todo {
 }
